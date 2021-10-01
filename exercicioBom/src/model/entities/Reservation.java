@@ -1,8 +1,10 @@
-package entitites;
+package model.entities;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import model.exceptions.DomaninException;
 
 public class Reservation {
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -40,18 +42,16 @@ public class Reservation {
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
 
-	public String updateDates(Date checkin, Date checkout) {
+	public void updateDates(Date checkout, Date checkin) throws DomaninException {
 		Date now = new Date();
-		if (checkin.before(now) || checkout.before(now)) {
-			return "Reservation dates for update must be future dates";
+		if (checkout.before(now) || checkin.before(now)) {
+			throw new DomaninException("Reservation dates for update must be future dates.");
 		}
-		if (checkout.after(checkin)) {
-			return "Check-out date must be after check-in date.";
+		if (checkin.after(now)) {
+			throw new DomaninException("Check-out date must be after check-in date.");
 		}
 		this.checkin = checkin;
 		this.checkout = checkout;
-
-		return null;
 	}
 
 	@Override
@@ -59,4 +59,5 @@ public class Reservation {
 		return "Room " + roomNumber + ", check-in: " + sdf.format(checkin) + ", check-out: " + sdf.format(checkout)
 				+ ", " + duration() + " nights";
 	}
+
 }
